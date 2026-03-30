@@ -39,12 +39,24 @@ from tools.sheets_tool import (
 )
 
 # ---------------------------------------------------------------------------
-# Build the Guard-only LangGraph (for private feedback processing)
+# Build the Inbound LangGraph (for private feedback processing)
 # ---------------------------------------------------------------------------
+from agents.feedback_analyser import analyse_feedback
 
 builder = StateGraph(ReviewGuardState)
+builder.add_node("analyzer", analyse_feedback)
 builder.add_node("guard", guard_node)
-builder.add_edge(START, "guard")
+
+builder.add_edge(START, "analyzer")
+
+def route_inbound(state: ReviewGuardState):
+    sentiment = state.get("sentiment", "negative")
+    if sentiment == "positive":
+        logger.info("Inbound route: positive feedback detected. Skipping guard.")
+        return END
+    return "guard"
+
+builder.add_conditional_edges("analyzer", route_inbound)
 builder.add_edge("guard", END)
 guard_graph = builder.compile()
 
@@ -124,7 +136,7 @@ def run_guard_pipeline(row: FormResponseRow) -> dict:
         "visit_date": None,
 
         "raw_feedback": row.feedback,
-        "sentiment": "negative",        # Hardcoded — they chose private feedback
+        "sentiment": "unknown",         # Will be determined by feedback_analyser
         "category": "Private Response",
 
         "recovery_email_draft": "",

@@ -40,9 +40,6 @@ def analyse_feedback(state: ReviewGuardState) -> dict:
     user_prompt = f"Customer feedback: {raw_feedback}"
 
     try:
-        # Load MCP Tools dynamically
-        mcp_tools = get_gmail_tools() + get_sheets_tools()
-
         logger.info("Agent [feedback_analyser]: Setting up LLM capabilities...")
         llm = ChatGroq(
             model="llama-3.1-8b-instant",
@@ -50,19 +47,14 @@ def analyse_feedback(state: ReviewGuardState) -> dict:
             temperature=0
         )
         
-        # Build tool-calling agent
-        agent = create_react_agent(llm, tools=mcp_tools)
+        # Extract sentiment directly (no tools needed here, prevents LLM confusion/misformatting)
+        response = llm.invoke([
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=user_prompt)
+        ])
         
-        # Invoke agent
-        response = agent.invoke({
-            "messages": [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_prompt)
-            ]
-        })
-        
-        # The AI's final response is the content of the last message
-        content = response["messages"][-1].content.strip()
+        # Parse the output
+        content = response.content.strip()
         
         # Parse the output
         sentiment = "neutral"
