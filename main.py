@@ -12,9 +12,13 @@ Orchestrates the two-phase pipeline:
                         → Mark as "Processed"
 """
 
+import os
 import sys
 from collections import Counter
 from typing import Any, Dict
+
+# Debug: dump env var keys at startup
+print(f"DEBUG ENV KEYS: {list(os.environ.keys())}", flush=True)
 
 from langgraph.graph import START, END, StateGraph
 
