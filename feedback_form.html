@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provide Feedback</title>
+    <!-- Google Fonts for branding -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <script>
+        // AEGIS Review Guard — Feedback Form
+        // To rebrand for a new client, only edit the CONFIG object below
+        const CONFIG = {
+          RESTAURANT_NAME: "Aqua Whiteladies",
+          BRAND_COLOR: "#2c5f2e",
+          BACKGROUND_COLOR: "#f8f9fa",
+          CARD_COLOR: "#ffffff",
+          FONT: "'Google Sans', Roboto, Arial, sans-serif",
+          SUBMIT_URL: "https://script.google.com/macros/s/AKfycbyEdSoufjdxG5Mv4jN2emyOWKbdyhUqzhNB2qYmx54CUqVjk-5s48EVIe0uGUzCfDCP/exec"
+        };
+    </script>
+    
+    <style>
+        :root {
+            /* Fallback defaults, overwritten dynamically by JS */
+            --brand-color: #2c5f2e; 
+            --bg-color: #f8f9fa;
+            --card-color: #ffffff;
+            --font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            --star-color: #f4b400;
+            
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border-color: #dadce0;
+            --star-inactive: #e0e0e0;
+            --error-color: #d93025;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            /* Premium subtle gradient based on config background color */
+            background: linear-gradient(135deg, var(--bg-color) 0%, #e9ecef 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 16px; /* Softer rounded corners */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 8px rgba(0, 0, 0, 0.04); /* Soft, premium shadow */
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Identity Block */
+        .identity {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .logo-circle {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background-color: var(--brand-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1.title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        p.subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px; /* softer input corners */
+            font-size: 15px;
+            font-family: var(--font-family);
+            color: var(--text-primary);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--brand-color);
+            box-shadow: 0 0 0 3px rgba(44, 95, 46, 0.1); /* Subtle brand halo */
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        /* Error Label */
+        .error-message {
+            color: var(--error-color);
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Buttons & Spinner */
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            justify-content: stretch;
+        }
+
+        .btn-submit {
+            background-color: var(--brand-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 24px;
+            height: 44px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit:disabled {
+            filter: grayscale(0.4);
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success View */
+        #success-view {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+            padding: 30px 0;
+        }
+
+        .success-icon {
+            color: #34a853; /* Google Green Checkmark */
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        h2.success-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        p.success-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        /* Footer Powered By */
+        .footer-branding {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #9aa0a6;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card" id="card">
+        <!-- Main Form View -->
+        <div id="form-view">
+            <div class="identity">
+                <div class="logo-circle" id="logo-container"></div>
+                <h1 class="title" id="display-title"></h1>
+                <p class="subtitle" id="display-tagline"></p>
+            </div>
+
+            <form id="feedbackForm">
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <textarea id="feedback" class="form-control" placeholder="Describe your experience (optional)"></textarea>
+                </div>
+                
+                <input type="hidden" id="timestamp_hidden" name="timestamp">
+
+                <div class="actions">
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <span class="btn-text">Send Private Feedback</span>
+                        <div class="spinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Thank You View -->
+        <div id="success-view">
+            <i class="material-icons-round success-icon">check_circle</i>
+            <h2 class="success-title">Thank you. Our team will be in touch shortly.</h2>
+        </div>
+    </div>
+    
+    <div class="footer-branding">
+        Powered by AEGIS
+    </div>
+
+    <script>
+        const { 
+            RESTAURANT_NAME, 
+            LOGO_URL, 
+            BRAND_COLOR, 
+            BACKGROUND_COLOR, 
+            CARD_COLOR,
+            FONT, 
+            SUBMIT_URL 
+        } = CONFIG;
+
+        // Map CSS Variables
+        const docStyle = document.documentElement.style;
+        if (BRAND_COLOR) docStyle.setProperty('--brand-color', BRAND_COLOR);
+        if (BACKGROUND_COLOR) docStyle.setProperty('--bg-color', BACKGROUND_COLOR);
+        if (CARD_COLOR) docStyle.setProperty('--card-color', CARD_COLOR);
+        if (FONT) docStyle.setProperty('--font-family', FONT);
+
+        // Bind DOM Elements
+        document.title = `${RESTAURANT_NAME} - Private Feedback`;
+        document.getElementById('display-title').innerText = "Share your feedback privately";
+        document.getElementById('display-tagline').innerText = "Help us improve — your feedback goes directly to our team";
+
+        const logoContainer = document.getElementById('logo-container');
+        if (LOGO_URL) {
+            logoContainer.innerHTML = `<img src="${LOGO_URL}" alt="Logo">`;
+        } else {
+            // Get first 2 letters
+            const initials = RESTAURANT_NAME.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            logoContainer.innerText = initials || "AW";
+        }
+
+        // Parse URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlName = urlParams.get('name') || "Anonymous Customer";
+        const urlEmail = urlParams.get('email') || "unknown@email.com";
+
+        // Form Submission
+        const form = document.getElementById('feedbackForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.querySelector('.btn-text');
+        const spinner = document.querySelector('.spinner');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Hydrate hidden timestamp field automatically
+            const timeField = document.getElementById('timestamp_hidden');
+            timeField.value = new Date().toISOString();
+
+            // Gather inputs
+            const payload = {
+                restaurant_name: RESTAURANT_NAME,
+                name: urlName,
+                email: urlEmail,
+                feedback: document.getElementById('feedback').value.trim(),
+                timestamp: timeField.value
+            };
+
+            // Loading state
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            submitBtn.disabled = true;
+
+            try {
+                if (!SUBMIT_URL) {
+                    // Fast track for dummy configuration
+                    console.log("No SUBMIT_URL established. Logging Payload: ", payload);
+                    await new Promise(r => setTimeout(r, 600));
+                    showSuccess();
+                    return;
+                }
+
+                // Perform POST (using no-cors + form encoding to bypass CORS preflight)
+                const formData = new URLSearchParams();
+                for (const [key, val] of Object.entries(payload)) {
+                    formData.append(key, val);
+                }
+
+                await fetch(SUBMIT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                });
+
+                await new Promise(r => setTimeout(r, 600));
+                showSuccess();
+
+            } catch (err) {
+                console.warn("POST failed.", err);
+                await new Promise(r => setTimeout(r, 600));
+                showSuccess(); // Graceful fallback
+            }
+        });
+
+        function showSuccess() {
+            document.getElementById('form-view').style.display = 'none';
+            document.getElementById('success-view').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

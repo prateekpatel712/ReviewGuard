@@ -1,0 +1,27 @@
+# Virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Credentials (NEVER commit these)
+credentials.json
+service_account.json
+token.json
+
+# Environment
+.env
+
+# Logs
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Test & setup scripts
+setup_e2e.py
+test_production.py

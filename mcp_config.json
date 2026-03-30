@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "gmail": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-gmail"],
+      "env": {
+        "GMAIL_CREDENTIALS": "${GMAIL_CREDENTIALS_PATH}"
+      }
+    },
+    "google-sheets": {
+      "command": "npx", 
+      "args": ["-y", "@modelcontextprotocol/server-google-sheets"],
+      "env": {
+        "GOOGLE_CREDENTIALS": "${GOOGLE_CREDENTIALS_PATH}"
+      }
+    }
+  }
+}
