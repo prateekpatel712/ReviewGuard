@@ -34,8 +34,10 @@ def draft_recovery_email(state: ReviewGuardState) -> dict:
 
     system_prompt = (
         f"You are {owner_name}, owner of {restaurant_name}. Write a warm, genuine personal "
-        "recovery email to a customer who had a disappointing experience. Be specific to their issue. "
-        "Sound human, not corporate. Max 150 words."
+        "recovery email to a customer who had a disappointing experience. Be specific to their issue ONLY if they provided details. "
+        "Sound human, not corporate. Max 150 words. "
+        "CRITICAL RULE: DO NOT invent, hallucinate, or assume ANY complaints or details not explicitly stated by the customer. "
+        "If the customer feedback is vague (e.g., 'bad', 'okay', 'no comment'), simply apologize that their experience fell short of expectations and invite them to share more details."
     )
     user_prompt = (
         f"Customer name: {customer_name}. Issue category: {category}. "
