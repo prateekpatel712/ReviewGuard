@@ -50,6 +50,7 @@ def _get_sheets_service():
     try:
         # Try base64-encoded credential from env var first (for cloud deployment)
         b64_creds = os.environ.get("GOOGLE_CREDENTIALS_B64", "")
+        logger.info(f"GOOGLE_CREDENTIALS_B64 present: {bool(b64_creds)}, length: {len(b64_creds)}")
         if b64_creds:
             creds_json = json.loads(base64.b64decode(b64_creds))
             credentials = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
