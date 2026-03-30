@@ -5,7 +5,7 @@ Configures and exposes a unified logging instance.
 
 import logging
 import os
-
+import sys
 
 def setup_logger() -> logging.Logger:
     """
@@ -30,7 +30,7 @@ def setup_logger() -> logging.Logger:
         logger.addHandler(file_handler)
 
         # Standard output
-        stream_handler = logging.StreamHandler()
+        stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(formatter)
         logger.addHandler(stream_handler)
         
