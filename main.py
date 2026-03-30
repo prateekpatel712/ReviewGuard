@@ -51,8 +51,8 @@ builder.add_edge(START, "analyzer")
 
 def route_inbound(state: ReviewGuardState):
     sentiment = state.get("sentiment", "negative")
-    if sentiment == "positive":
-        logger.info("Inbound route: positive feedback detected. Skipping guard.")
+    if sentiment in ["positive", "neutral"]:
+        logger.info(f"Inbound route: {sentiment} feedback detected. Skipping guard.")
         return END
     return "guard"
 

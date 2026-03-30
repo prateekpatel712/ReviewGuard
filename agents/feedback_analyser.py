@@ -33,8 +33,9 @@ def analyse_feedback(state: ReviewGuardState) -> dict:
 
     system_prompt = (
         f"You are a customer experience analyst for {restaurant_name}. Analyse the customer "
-        "feedback and return ONLY this exact format with no extra text:\n"
-        "SENTIMENT: positive|negative|neutral\n"
+        "feedback. If it contains a complaint, criticism, or dissatisfaction, output 'negative'. "
+        "If it is praise, neutral, or acceptable, output 'positive'. Return ONLY this exact format with no extra text:\n"
+        "SENTIMENT: positive|negative\n"
         "CATEGORY: Food Quality|Service Speed|Staff Attitude|Value for Money|Ambience|Other"
     )
     user_prompt = f"Customer feedback: {raw_feedback}"
@@ -61,15 +62,16 @@ def analyse_feedback(state: ReviewGuardState) -> dict:
         category = "Other"
         
         for line in content.split('\n'):
-            line = line.strip()
-            if line.upper().startswith("SENTIMENT:"):
-                raw_sentiment = line.split(":", 1)[1].strip().lower()
-                if "|" in raw_sentiment or raw_sentiment not in ["positive", "negative", "neutral"]:
-                    sentiment = "neutral"
+            line = line.strip().lower()
+            if line.startswith("sentiment:"):
+                if "positive" in line:
+                    sentiment = "positive"
+                elif "negative" in line:
+                    sentiment = "negative"
                 else:
-                    sentiment = raw_sentiment
-            elif line.upper().startswith("CATEGORY:"):
-                category = line.split(":", 1)[1].strip()
+                    sentiment = "neutral"
+            elif line.startswith("category:"):
+                category = line.split(":", 1)[1].strip().title()
                 
         logger.info(f"Agent [feedback_analyser]: Output parsed -> {sentiment.upper()} | {category}")
         return {
