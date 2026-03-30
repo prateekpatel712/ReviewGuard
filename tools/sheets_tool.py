@@ -48,15 +48,23 @@ def _get_sheets_service():
         raise RuntimeError("GOOGLE_SHEETS_ID is not set. Please add it to your .env file.")
 
     try:
-        # Try base64-encoded credential from env var first (for cloud deployment)
+        # Option 1: Raw JSON string from env var (most reliable for Railway)
+        json_creds = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
+        # Option 2: Base64-encoded credential from env var
         b64_creds = os.environ.get("GOOGLE_CREDENTIALS_B64", "")
-        logger.info(f"GOOGLE_CREDENTIALS_B64 present: {bool(b64_creds)}, length: {len(b64_creds)}")
-        if b64_creds:
+
+        if json_creds:
+            logger.info("Loading credentials from GOOGLE_CREDENTIALS_JSON env var.")
+            creds_json = json.loads(json_creds)
+            credentials = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
+        elif b64_creds:
+            logger.info("Loading credentials from GOOGLE_CREDENTIALS_B64 env var.")
             creds_json = json.loads(base64.b64decode(b64_creds))
             credentials = Credentials.from_service_account_info(creds_json, scopes=SCOPES)
         else:
             # Fallback to local file
             creds_path = settings.google_credentials_path
+            logger.info(f"No env var credentials found. Falling back to file: {creds_path}")
             credentials = Credentials.from_service_account_file(creds_path, scopes=SCOPES)
     except FileNotFoundError as exc:
         logger.error(f"Service account file missing")

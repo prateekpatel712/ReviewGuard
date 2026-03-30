@@ -47,8 +47,17 @@ def _get_gmail_service():
     creds: Credentials | None = None
 
     # Try loading token from env var first (cloud), then file (local)
+    # Option 1: Raw JSON string (most reliable for Railway)
+    token_json = os.environ.get("GMAIL_TOKEN_JSON", "")
+    # Option 2: Base64-encoded token
     token_b64 = os.environ.get("GMAIL_TOKEN_B64", "")
-    if token_b64:
+
+    if token_json:
+        logger.info("Loading Gmail token from GMAIL_TOKEN_JSON env var.")
+        token_data = json.loads(token_json)
+        creds = Credentials.from_authorized_user_info(token_data, SCOPES)
+    elif token_b64:
+        logger.info("Loading Gmail token from GMAIL_TOKEN_B64 env var.")
         token_data = json.loads(base64.b64decode(token_b64))
         creds = Credentials.from_authorized_user_info(token_data, SCOPES)
     elif TOKEN_PATH.exists():
@@ -59,7 +68,7 @@ def _get_gmail_service():
             try:
                 creds.refresh(Request())
                 # Save refreshed token back to file if running locally
-                if not token_b64:
+                if not token_b64 and not token_json:
                     TOKEN_PATH.write_text(creds.to_json())
             except Exception as exc:
                 logger.error(f"Failed to refresh Gmail token: {exc}")
