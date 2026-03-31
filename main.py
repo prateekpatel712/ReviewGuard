@@ -14,8 +14,11 @@ Orchestrates the two-phase pipeline:
 
 import os
 import sys
+import time
 from collections import Counter
 from typing import Any, Dict
+
+MAX_BATCH_SIZE = 40  # Safely limits execution size to prevent Google API quota exhaustion
 
 # Debug: dump env var keys at startup
 print(f"DEBUG ENV KEYS: {list(os.environ.keys())}", flush=True)
@@ -88,7 +91,11 @@ def send_all_pending_emails():
         return
 
     total = len(pending_rows)
-    logger.info(f"Found {total} new customer(s) to email.")
+    if total > MAX_BATCH_SIZE:
+        logger.info(f"Found {total} new customers. Limiting to first {MAX_BATCH_SIZE} to ensure API limits are respected.")
+        pending_rows = pending_rows[:MAX_BATCH_SIZE]
+    else:
+        logger.info(f"Found {total} new customer(s) to email.")
 
     sent_count = 0
     error_count = 0
@@ -113,8 +120,11 @@ def send_all_pending_emails():
         except Exception as exc:
             logger.error(f"[{row.name}] ❌ Failed: {exc}")
             error_count += 1
+            
+        # Hard sleep boundary ensures we never hit the Google Sheets 60-writes-per-minute API quota
+        time.sleep(1.5)
 
-    logger.info(f"Phase 1 complete: {sent_count}/{total} emails sent.")
+    logger.info(f"Phase 1 complete: {sent_count}/{min(total, MAX_BATCH_SIZE)} emails sent.")
     if error_count > 0:
         logger.error(f"Encountered errors on {error_count} row(s).")
 
@@ -174,7 +184,11 @@ def process_all_form_responses():
         return
 
     total = len(pending_forms)
-    logger.info(f"Found {total} private feedback(s) to process.")
+    if total > MAX_BATCH_SIZE:
+        logger.info(f"Found {total} private feedbacks. Limiting to first {MAX_BATCH_SIZE} to ensure API limits are respected.")
+        pending_forms = pending_forms[:MAX_BATCH_SIZE]
+    else:
+        logger.info(f"Found {total} private feedback(s) to process.")
 
     processed_count = 0
     error_count = 0
@@ -192,8 +206,11 @@ def process_all_form_responses():
         except Exception as exc:
             logger.error(f"[{row.name}] ❌ Pipeline failed: {exc}")
             error_count += 1
+            
+        # Hard sleep boundary ensures we never hit the Google Sheets 60-writes-per-minute API quota
+        time.sleep(1.5)
 
-    logger.info(f"Phase 2 complete: {processed_count}/{total} processed.")
+    logger.info(f"Phase 2 complete: {processed_count}/{min(total, MAX_BATCH_SIZE)} processed.")
     if error_count > 0:
         logger.error(f"Encountered errors on {error_count} row(s).")
 
