@@ -194,11 +194,11 @@ def send_review_request(
         <p>If you have a moment, we'd love to hear your thoughts — it helps other food-lovers discover us too.</p>
         <div style="text-align: center; margin: 32px 0;">
             <a href="{google_review_link}" style="background-color: #4CAF50; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-bottom: 16px; width: 80%; max-width: 300px;">
-                ⭐ Leave a Review
+                Leave a Review
             </a>
             <br>
             <a href="{private_feedback_link}" style="background-color: #f1f3f4; color: #5f6368; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-block; width: 80%; max-width: 300px; font-size: 14px;">
-                Share Private Feedback
+                Complaint
             </a>
         </div>
         <p>Warm regards,<br><strong>{owner}</strong><br><em>{restaurant}</em></p>
